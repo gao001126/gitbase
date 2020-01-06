@@ -9,14 +9,14 @@
             <el-table-column type="selection"></el-table-column>
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="name" label="栏目名称" width="180"></el-table-column>
-        <el-table-column prop="number" label="序号"></el-table-column>
+        <el-table-column prop="num" label="序号"></el-table-column>
         <el-table-column prop="parentId" label="父栏目"></el-table-column>
         <el-table-column  label="操作">
             <template v-slot="slot">
-                 <a href="" @click.prevent="toUpdateHandler" class="el-icon-edit"></a>
-                 <a href="" @click.prevent="toDeleteHandler" class="el-icon-delete"></a>
-                 <a href="" >详情</a>
-            </template>
+                <a href="" @click.prevent="toUpdateHandler(slot.row)" class="el-icon-edit"></a>
+                <a href="" @click.prevent="toDeleteHandler(slot.row.id)" class="el-icon-delete"></a>
+                <a href="">详情</a> 
+          </template>
         </el-table-column>
         </el-table>
         <!-- 表格结束 -->
@@ -62,28 +62,30 @@ export default {
             this.visible=true
             this.title="添加栏目信息"
         },
-        toUpdateHandler(){
+        toUpdateHandler(row){
             this.visible=true
+            this.form=row;
             this.title="修改栏目信息"
         },
-        toDeleteHandler(){
-            this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        toDeleteHandler(id){
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
+         
+          let url="http://localhost:6677/customer/deleteById?id="+id;
+          request.get(url).then((response)=>{
+            this.loadData()
+             this.$message({
             type: 'success',
-            message: '删除成功!'+id
+            message: response.message
           });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
-        });
-      
-        },
+        })
+
+          })
+          
+      },
         closeModalHandler(){
             this.visible=false
 

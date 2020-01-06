@@ -6,18 +6,18 @@
         <!-- 按钮结束 -->
         <!-- 表格开始 -->
         <el-table :data="products" border style="width: 100%">
-        <el-table-column prop="id" label="编号" width="180"></el-table-column>
-        <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
-        <el-table-column prop="description" label="描述"></el-table-column>
-        <el-table-column prop="photo" label="图片"></el-table-column>
+        <el-table-column prop="id" label="编号" width="100" ></el-table-column>
+        <el-table-column prop="name" label="产品名称" width="100"></el-table-column>
+        <el-table-column prop="description" label="描述" width="100"></el-table-column>
+        <el-table-column prop="photo" label="图片" width="200px"></el-table-column>
         <el-table-column prop="price" label="价格"></el-table-column>
-        <el-table-column prop="status" label="所属产品"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column prop="status" label="所属产品" fixed="right"></el-table-column>
+        <el-table-column label="操作" fixed="right">
             <template v-slot="slot">
-                 <a href="" @click.prevent="toUpdateHandler" class="el-icon-edit"></a>
-                 <a href="" @click.prevent="toDeleteHandler" class="el-icon-delete"></a>
-                 <a href="" >详情</a>
-            </template>
+                <a href="" @click.prevent="toUpdateHandler(slot.row)" class="el-icon-edit"></a>
+                <a href="" @click.prevent="toDeleteHandler(slot.row.id)" class="el-icon-delete"></a>
+                <a href="">详情</a> 
+          </template>
         </el-table-column>
         </el-table>
         <!-- 表格结束 -->
@@ -50,21 +50,26 @@
           </el-select>
     </el-form-item>
     </el-form> 
-    <el-form  label-width="80px"><el-form-item label="介绍">
-          <el-input ></el-input>
-        </el-form-item> 
+    <el-form>
+    <el-form-item label="描述" label-width="80px">
+     <el-input type="textarea" v-model="form.description">
+     </el-input>
+     </el-form-item>
     </el-form> 
-    <el-upload
-  class="upload-demo"
-  action="https://134.175.154.93:6677/file/upload"
-  :on-success="uploadSuccessHandler"
-  :file-list="fileList"
-  list-type="picture">
-  <el-button size="small" type="primary">点击上传</el-button>
-  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-</el-upload>
-   
-     
+    <el-form>
+       <el-form-item label="图片" label-width="80px">
+      <el-upload
+        class="upload-demo"
+        action="http://134.175.154.93:6677/file/upload"
+        :on-success="uploadSuccessHandler"
+        :file-list="fileList"
+        list-type="picture">
+        <el-button size="small" type="primary">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
+      </el-form-item>
+    </el-form>
+         
       <span slot="footer" class="dialog-footer">
     <el-button @click="closeModalHandler">取 消</el-button>
     <el-button type="primary" @click="submitHandler">确 定</el-button>
@@ -79,10 +84,11 @@ import request from '@/utils/request'
 import querystring from 'querystring'
 export default {
      methods:{
+      //  加载栏目信息
        uploadSuccessHandler(response){
          let photo = "http://134.175.154.93:8888/group1/"+response.data.id
          this.form.photo=photo;
-
+        //  将图片地址设置到form中，便于一起交给后台
          console.log(response);
        },
 
@@ -101,16 +107,33 @@ export default {
      })
         },
         toAddhandler(){
+            this.fileList=[];
+            this.visible=true
+        },
+        toUpdateHandler(row){
           this.fileList=[];
             this.visible=true
+            this.form=row;
         },
-        toUpdateHandler(){
-          this.fileList=[];
-            this.visible=true
-        },
-        toDeleteHandler(){
-            this.visible=true
-        },
+       toDeleteHandler(id){
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+         
+          let url="http://localhost:6677/customer/deleteById?id="+id;
+          request.get(url).then((response)=>{
+            this.loadData()
+             this.$message({
+            type: 'success',
+            message: response.message
+          });
+        })
+
+          })
+          
+      },
         closeModalHandler(){
             this.visible=false
 
@@ -140,9 +163,7 @@ export default {
        visible:false,
        products:[],
        options:[],
-       form:{
-           
-       },
+       form:{},
        fileList:[]
 
         }
