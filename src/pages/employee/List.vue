@@ -15,8 +15,8 @@
             <el-table-column width="200" prop="bankCard" label="银行卡号"></el-table-column>
             <el-table-column fixed="right" label="操作">
                 <template v-slot="slot"> 
-                  <a href="" @click.prevent="toUpdateHandler(slot.row.name)" class="el-icon-edit"></a>
-                 <a href="" @click.prevent="toDeleteHandler(slot.row)" class="el-icon-delete"></a>
+                  <a href="" @click.prevent="toUpdateHandler(slot.row)" class="el-icon-edit"></a>
+                 <a href="" @click.prevent="toDeleteHandler(slot.row.name)" class="el-icon-delete"></a>
                    
                 </template>
             </el-table-column>
@@ -122,6 +122,8 @@ export default {
         toUpdateHandler(row){
             this.title = "修改员工信息"
             this.visible = true;
+             this.form=row;
+            
         },
         closeModalHandler(){
             this.visible = false;
