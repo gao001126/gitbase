@@ -72,7 +72,11 @@
           <el-input v-model="form.telephone"></el-input>
         </el-form-item>
       </el-form>
-      
+      <el-form :modul="form" label-width="80px">
+        <el-form-item label="顾客ID">
+          <el-input v-model="form.customerId"></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
     <el-button @click="closeModalHandler">取 消</el-button>
     <el-button type="primary" @click="submitHandler">确 定</el-button>
